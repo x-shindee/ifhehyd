@@ -176,7 +176,7 @@
 
     function sendQuestion() {
   const q = inputEl.value.trim();
-  if (!q) return; // Don't send if input is empty
+  if (!q) return;
 
   addMessage(q, "user");
   inputEl.value = "";
@@ -185,7 +185,7 @@
   fetch("https://script.google.com/macros/s/AKfycbwvtzNo-mgYl-sdjqAnH9jHsRCNIXYGau1hUL2PNYxQLZrNyCO8FNLcYK3_NZWg1jWp/exec", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ question: q }) // ✅ Corrected
+    body: JSON.stringify({ question: q })
   })
     .then(r => r.json())
     .then(data => {
@@ -197,10 +197,9 @@
       addMessage("<i>⚠️ Error connecting to server.</i>", "bot");
     });
 }
-    }
 
-    btn.addEventListener("click", sendQuestion);
-    inputEl.addEventListener("keyup", e => { if (e.key==="Enter") sendQuestion(); });
-  </script>
+btn.addEventListener("click", sendQuestion);
+inputEl.addEventListener("keyup", e => { if (e.key === "Enter") sendQuestion(); });
+</script>
 </body>
 </html>
