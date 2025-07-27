@@ -175,26 +175,28 @@
     }
 
     function sendQuestion() {
-      const q = inputEl.value.trim();
-      if (!q) return;
-      addMessage(q, "user");
-      inputEl.value = "";
-      showTyping();
+  const q = inputEl.value.trim();
+  if (!q) return; // Don't send if input is empty
 
-      fetch("https://script.google.com/macros/s/AKfycbwvtzNo-mgYl-sdjqAnH9jHsRCNIXYGau1hUL2PNYxQLZrNyCO8FNLcYK3_NZWg1jWp/exec", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ question: userInput.trim() })
-})
-      .then(r => r.json())
-      .then(data => {
-        hideTyping();
-        addMessage(data.answer || "<i>No answer received.</i>", "bot");
-      })
-      .catch(() => {
-        hideTyping();
-        addMessage("<i>⚠️ Error connecting to server.</i>", "bot");
-      });
+  addMessage(q, "user");
+  inputEl.value = "";
+  showTyping();
+
+  fetch("https://script.google.com/macros/s/AKfycbwvtzNo-mgYl-sdjqAnH9jHsRCNIXYGau1hUL2PNYxQLZrNyCO8FNLcYK3_NZWg1jWp/exec", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question: q }) // ✅ Corrected
+  })
+    .then(r => r.json())
+    .then(data => {
+      hideTyping();
+      addMessage(data.answer || "<i>No answer received.</i>", "bot");
+    })
+    .catch(() => {
+      hideTyping();
+      addMessage("<i>⚠️ Error connecting to server.</i>", "bot");
+    });
+}
     }
 
     btn.addEventListener("click", sendQuestion);
