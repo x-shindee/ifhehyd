@@ -181,11 +181,11 @@
       inputEl.value = "";
       showTyping();
 
-      fetch("/api", {
+      fetch("https://script.google.com/macros/s/AKfycbwvtzNo-mgYl-sdjqAnH9jHsRCNIXYGau1hUL2PNYxQLZrNyCO8FNLcYK3_NZWg1jWp/exec", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ question })
-      })
+  body: JSON.stringify({ question: userInput.trim() })
+});
       .then(r => r.json())
       .then(data => {
         hideTyping();
