@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IFHE Hyderabad Chatbot (Beta)</title>
+  <style>
+    /* ---- Root & Reset ---- */
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height:100vh;
+    }
+    /* ---- Container ---- */
+    .chat-container {
+      background: #fff;
+      width: 95%;
+      max-width: 500px;
+      height: 80vh;
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      overflow: hidden;
+      position: relative;
+    }
+    /* ---- Header ---- */
+    .header {
+      padding: 15px;
+      background: #2a6ac7;
+      color: #fff;
+      text-align: center;
+    }
+    .header h2 { font-size: 1.25rem; }
+    .caution {
+      padding: 5px 15px;
+      font-size: 0.75rem;
+      background: #eef2f7;
+      color: #555;
+      text-align: center;
+    }
+    /* ---- Chat Box ---- */
+    #chat-box {
+      flex:1;
+      padding: 15px;
+      overflow-y: auto;
+      background: #fafafa;
+    }
+    .message {
+      max-width: 80%;
+      margin: 8px 0;
+      padding: 10px 12px;
+      border-radius: 12px;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: slideFadeIn 0.3s forwards;
+    }
+    .user {
+      background: #2a6ac7;
+      color: white;
+      margin-left: auto;
+    }
+    .bot {
+      background: #e4e7eb;
+      color: #222;
+      margin-right: auto;
+    }
+    @keyframes slideFadeIn {
+      to { opacity:1; transform: translateY(0); }
+    }
+    /* ---- Typing Indicator ---- */
+    .typing {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 12px;
+      background: #e4e7eb;
+      width: 60px;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: #777;
+      border-radius: 50%;
+      animation: blink 1s infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0.3; }
+      40% { opacity: 1; }
+    }
+    /* ---- Input ---- */
+    .input-container {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+    #question {
+      flex:1;
+      padding: 12px;
+      border:none;
+      outline:none;
+      font-size:1rem;
+    }
+    #send-btn {
+      background: #2a6ac7;
+      border:none;
+      color:#fff;
+      padding: 0 16px;
+      cursor:pointer;
+      transition:background 0.2s, transform 0.1s;
+    }
+    #send-btn:active { transform: scale(0.97); }
+    /* ---- Watermark ---- */
+    .watermark {
+      position: absolute;
+      bottom: 8px; right: 12px;
+      font-size: 0.7rem;
+      color: rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="header">
+      <h2>🎓 IFHE Hyderabad Chatbot (Beta)</h2>
+    </div>
+    <div class="caution">
+      ⚠️ This bot is still under development by a student of IFHE Hyderabad and may make mistakes. Always verify important information on the official IFHE website.
+    </div>
+    <div id="chat-box"></div>
+    <div class="input-container">
+      <input id="question" type="text" placeholder="Ask something about IFHE Hyderabad…" autocomplete="off"/>
+      <button id="send-btn">Ask</button>
+    </div>
+    <div class="watermark">Developed by VJ</div>
+  </div>
+
+  <script>
+    const WEBAPP_URL = "/api";
+    const chatBox = document.getElementById("chat-box");
+    const inputEl = document.getElementById("question");
+    const btn = document.getElementById("send-btn");
+
+    function scrollToBottom() {
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function addMessage(text, cls) {
+      const msg = document.createElement("div");
+      msg.className = `message ${cls}`;
+      msg.innerHTML = text;
+      chatBox.appendChild(msg);
+      scrollToBottom();
+    }
+
+    function showTyping() {
+      const typing = document.createElement("div");
+      typing.className = "typing bot";
+      typing.id = "typing";
+      typing.innerHTML = `<div class="dot"></div><div class="dot"></div><div class="dot"></div>`;
+      chatBox.appendChild(typing);
+      scrollToBottom();
+    }
+
+    function hideTyping() {
+      const t = document.getElementById("typing");
+      if (t) t.remove();
+    }
+
+    function sendQuestion() {
+      const q = inputEl.value.trim();
+      if (!q) return;
+      addMessage(q, "user");
+      inputEl.value = "";
+      showTyping();
+
+      fetch(WEBAPP_URL, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({question: q})
+      })
+      .then(r => r.json())
+      .then(data => {
+        hideTyping();
+        addMessage(data.answer || "<i>No answer received.</i>", "bot");
+      })
+      .catch(() => {
+        hideTyping();
+        addMessage("<i>⚠️ Error connecting to server.</i>", "bot");
+      });
+    }
+
+    btn.addEventListener("click", sendQuestion);
+    inputEl.addEventListener("keyup", e => { if (e.key==="Enter") sendQuestion(); });
+  </script>
+</body>
+</html>
