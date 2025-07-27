@@ -181,10 +181,10 @@
       inputEl.value = "";
       showTyping();
 
-      fetch(WEBAPP_URL, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({question: q})
+      fetch("/api", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ question })
       })
       .then(r => r.json())
       .then(data => {
